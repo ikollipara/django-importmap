@@ -19,16 +19,15 @@ def pin(name: str, version: str = "latest"):
     _PACKAGES.append(_Package(name=name, version=version, remote=True))
 
 def pin_from_apps():
-    """Pin the javascript files from the STATIC_SRC_DIR"""
+    """Pin the javascript files from the static folder"""
 
     from django.apps import apps
     from django.conf import settings
 
-    STATIC_SRC_DIR = getattr(settings, "STATIC_SRC_DIR", "static_src")
 
     for config in apps.get_app_configs():
         for p in Path(config.path).glob("*"):
-            if p.is_dir() and p.name == STATIC_SRC_DIR:
-                config_path = Path(config.path) / STATIC_SRC_DIR
+            if p.is_dir() and p.name == "static":
+                config_path = Path(config.path) / "static"
                 config_path.relative_to(settings.BASE_DIR)
                 _PACKAGES.append(_Package(name=f"@app/{config.name.replace(".", "-").replace("_", "-").lower()}", version=f"{config_path.relative_to(settings.BASE_DIR)}", remote=False))
